@@ -1,0 +1,33 @@
+#!/bin/bash
+
+dkr(){
+  case $1 in
+    (kill|k)) docker kill $(docker ps -q) ;;
+    login) $(aws ecr get-login --no-include-email) ;;
+    pull) $(aws ecr get-login --no-include-email)
+          docker-compose -f $(find . -maxdepth 1 -name docker-compose.*) pull
+    reset) echo -e "\e[0;31mWARNING: This will clear all networks and delete all containers and images. \e[0;0m"
+           echo -n "Are you sure you want to reset?(y/n) "
+           read answer
+           case $answer:l in
+             y|yes) docker kill $(docker ps -q) | docker network prune | docker rm $(docker ps -q) | docker rmi $(docker images -q) ;;
+             *) ;;
+           esac ;;
+    rmc) echo -n "Are you sure you want to remove all containers?(y/n) "
+         read answer
+         case $answer:l in
+           y|yes) docker rm $(docker ps -a -q) ;;
+           *) ;;
+         esac ;;
+    rmi) echo -n "Are you sure you want to remove all images?(y/n) "
+         read answer
+         case $answer:l in
+           y|yes) if [[ $2 == -f || $2 == --force ]] ; then docker rmi -f $(docker images -q)
+                  else docker rmi $(docker images -q) ; fi ;;
+           *) ;;
+         esac ;;
+    up) echo - "Initializing docker services..."
+        docker-compose -f $(find . -maxdepth 1 -name docker-compose.*) up ;;
+    *) echo "Usage: $0 {k|kill|login|pull|reset|rmc|rmi}" ;;
+  esac
+}

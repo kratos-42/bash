@@ -1,0 +1,41 @@
+#!/bin/bash
+# Parse endpoints
+
+grep "GET /\|POST /\|PATCH /\|DELETE /" -r $1 | cut -d '(' -f2 |
+  awk '
+      BEGIN { FS=","; path=""; }
+      {
+        path = substr($1, 2, length($1)-2) ## Remove quotes from begin and end of endpoint.
+
+        for (i = 1; i <= NF; i++) {
+          ORS = "\n";
+          switch($i) {
+            case /[GET\|POST\|PATCH\|DELETE]/:
+              switch(NF) {
+                case 3:
+                  printf "%s \n", path;
+                  break;
+                case 4:
+                  printf "%s %s\n", path, $3;
+                  break;
+                case 5:
+                  printf "%s %s %s\n", path, $3, $4;
+                  break;
+                case 6:
+                  printf "%s %s %s %s\n", path, $3, $4, $5;
+                  break;
+                case 7:
+                  printf "%s %s %s %s %s\n", path, $3, $4, $5, $6;
+                  break;
+                case 8:
+                  printf "%s %s %s %s %s %s\n", path, $3, $4, $5, $6, $7;
+                  break;
+                default:
+                  print $1, "Error: Problably this endpoint has more than 5 middlewares or has bad format.";
+                  break;
+              }
+          }
+        }
+      }
+      ' \
+  1> result.txt

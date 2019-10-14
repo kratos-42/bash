@@ -1,0 +1,14 @@
+ #!/bin/bash
+
+PATTERN=$1
+
+if [[ $# -ne 1 ]]; then
+  echo "You must provide the name/part of the name of the process you are looking for.";
+  exit 1;
+fi
+
+ps -ef | grep $PATTERN | grep -v "grep\|\.\/find_process.sh" | awk '{
+  if ($8 != "sh") {
+    print $2 "\t Process: " $8;
+  }
+}'

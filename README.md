@@ -6,7 +6,7 @@ This repository contains some util `bash` commands.
 
 A docker command util to handle docker containers and images and docker-compose files.
 
-## [Pasers](./parsers)
+## [Parsers](./parsers)
 
 A module to store any type of parsers.
 
